@@ -31,10 +31,27 @@
 	const mergedProps = $derived(mergeProps(restProps, resizerState.props));
 </script>
 
+<!--
+	A junction sits at the end of the resizer it is anchored to, and flex has already put
+	that resizer in the right place, so rendering it here needs no measured coordinates.
+-->
+{#snippet junctions()}
+	{#each resizerState.hostedJunctions as hosted (hosted.junction.id)}
+		{#if hosted.child}
+			{@render hosted.child({ props: hosted.props, junction: hosted.junction })}
+		{:else}
+			<div {...hosted.props}>
+				{@render hosted.children?.({ junction: hosted.junction })}
+			</div>
+		{/if}
+	{/each}
+{/snippet}
+
 {#if child}
-	{@render child({ props: mergedProps })}
+	{@render child({ props: mergedProps, junctions, getLinkedIds: resizerState.getLinkedIds })}
 {:else}
 	<div {...mergedProps}>
 		{@render children?.()}
+		{@render junctions()}
 	</div>
 {/if}

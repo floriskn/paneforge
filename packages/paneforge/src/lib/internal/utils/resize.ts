@@ -10,15 +10,18 @@ export function resizePane({
 	paneConstraints: paneConstraintsArray,
 	paneIndex,
 	initialSize,
+	total,
 }: {
 	paneConstraints: PaneConstraints[];
 	paneIndex: number;
 	initialSize: number;
+	/** The size the group has to share out, in the unit its layout is kept in. */
+	total: number;
 }): number {
 	const paneConstraints = paneConstraintsArray[paneIndex];
 	assert(paneConstraints != null, "Pane constraints should not be null.");
 
-	const { collapsedSize = 0, collapsible, maxSize = 100, minSize = 0 } = paneConstraints;
+	const { collapsedSize = 0, collapsible, maxSize = total, minSize = 0 } = paneConstraints;
 
 	let newSize = initialSize;
 

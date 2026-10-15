@@ -10,26 +10,61 @@ section: Components
 
 The `Pane` component is used to create an individual pane within a `PaneGroup`.
 
+## Sizes
+
+Every size on a pane is read in its own `units`: a share of the group by default, or pixels
+when the pane is set to `units="pixels"`. Panes of both kinds can sit in the same group.
+
+A size can also name its own unit, as `minSize="180px"` or `maxSize="60%"`, which is read in
+that unit whatever the pane is sized in. A limit in pixels is the same limit wherever the pane
+sits, so a pane that takes a share of the group can still refuse to go below the width its
+contents need. See [Pixel sizes](/docs/examples/pixel-sizes).
+
 ## Props
 
+<PropField name="units" type="'percentage' | 'pixels'" default="its group's units">
+
+The unit this pane is sized in, which is the unit every size on it is read in —
+`defaultSize`, `minSize`, `maxSize`, `collapsedSize`, and the sizes reported by `onResize` and
+`getSize`.
+
+A `percentage` pane takes a share of the group, so it follows the group as it resizes. A
+`pixels` pane is absolute: it keeps its size when the group changes size, and the difference
+is taken up by the panes sizing themselves as a share.
+
+</PropField>
+
 <PropField name="collapsedSize" type="number">
-The size of the pane when it is in a collapsed state in percentage of the group's size.
+The size of the pane when it is in a collapsed state, in the pane's own units.
 </PropField>
 
 <PropField name="collapsible" type="boolean">
 Whether the pane can be collapsed.
 </PropField>
 
-<PropField name="defaultSize" type="number">
-The default size of the pane in percentage of the group's size.
+<PropField name="defaultSize" type="number | '180px' | '20%'">
+
+The size the pane starts at, in its own units, or in the unit it names. Leave it off and the
+pane takes an even share of whatever the panes that do have one have not claimed, which is how
+you say "fill the space left over".
+
 </PropField>
 
-<PropField name="maxSize" type="number" default="100">
-The maximum size of the pane in percentage of the group's size.
+<PropField name="maxSize" type="number | '180px' | '20%'" default="the whole group">
+The largest the pane may be, in its own units, or in the unit it names.
 </PropField>
 
-<PropField name="minSize" type="number" default="0">
-The minimum size of the pane in percentage of the group's size.
+<PropField name="minSize" type="number | '180px' | '20%'" default="0">
+
+The smallest the pane may be, in its own units, or in the unit it names.
+
+A limit in pixels does not move with the group, so the same pane has the same smallest size
+however deeply it is nested. A limit given as a share moves with the group instead.
+
+It is also applied as a `min-width` or `min-height` on the pane, so flexbox holds it there to
+the exact pixel. Collapsible panes are left out of that, since they have to be able to reach
+their `collapsedSize`.
+
 </PropField>
 
 <PropField name="order" type="number">
@@ -95,5 +130,7 @@ export type PaneAttributes = {
 	"data-pane-id": string;
 	/** The ID of the pane's group. */
 	"data-pane-group-id": string;
+	/** The unit the pane is sized in. */
+	"data-units": "percentage" | "pixels";
 };
 ```

@@ -40,6 +40,45 @@ The underlying DOM element of the pane group. You can `bind` to this prop to get
 
 </PropField>
 
+## Child Snippet
+
+The `child` snippet lets you render your own element for the resize handle. It receives the
+handle's props, along with a `junctions` snippet holding any
+[junctions](https://paneforge.com/docs/components/pane-junctions) anchored to this resizer.
+Render it inside your element so they are positioned correctly — you can leave it out if you
+aren't using `PaneJunctions`.
+
+```svelte
+<PaneResizer>
+	{#snippet child({ props, junctions })}
+		<div {...props}>
+			<span class="grip"></span>
+			{@render junctions()}
+		</div>
+	{/snippet}
+</PaneResizer>
+```
+
+It also receives `getLinkedIds()`, which returns the ids of the resizers that would be dragged
+along with this one because they line up with it — see
+[`align`](/docs/examples/aligned-grids). Dividers are linked by where they currently are, so
+it is measured when called rather than held onto:
+
+```svelte
+<PaneResizer>
+	{#snippet child({ props, junctions, getLinkedIds })}
+		<!-- Dividers that move as one, lit as one. -->
+		<div
+			{...props}
+			onmouseenter={() => (lit = [id, ...getLinkedIds()])}
+			onmouseleave={() => (lit = [])}
+		>
+			{@render junctions()}
+		</div>
+	{/snippet}
+</PaneResizer>
+```
+
 ## Data Attributes
 
 The following data attributes are available for the `PaneResizer` component:

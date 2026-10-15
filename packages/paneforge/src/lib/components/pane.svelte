@@ -18,6 +18,7 @@
 		onExpand = noop,
 		onResize = noop,
 		order,
+		units,
 		child,
 		children,
 		...restProps
@@ -38,6 +39,7 @@
 		onExpand: box.with(() => onExpand),
 		onResize: box.with(() => onResize),
 		order: box.with(() => order),
+		units: box.with(() => units),
 	});
 
 	export const collapse = paneState.pane.collapse;

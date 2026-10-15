@@ -5,7 +5,7 @@ import { resizePane } from "./resize.js";
 
 /**
  * Adjusts the layout of panes based on the delta of the resize handle.
- * All units must be in percentages; pixel values should be pre-converted.
+ * Every size must be in the unit the group keeps its layout in.
  *
  * Credit: https://github.com/bvaughn/react-resizable-panels
  */
@@ -15,12 +15,15 @@ export function adjustLayoutByDelta({
 	paneConstraints: paneConstraintsArray,
 	pivotIndices,
 	trigger,
+	total,
 }: {
 	delta: number;
 	layout: number[];
 	paneConstraints: PaneConstraints[];
 	pivotIndices: number[];
 	trigger: "imperative-api" | "keyboard" | "mouse-or-touch";
+	/** The size the group has to share out, in the unit its layout is kept in. */
+	total: number;
 }): number[] {
 	if (areNumbersAlmostEqual(delta, 0)) return prevLayout;
 
@@ -114,7 +117,8 @@ export function adjustLayoutByDelta({
 			const maxSafeSize = resizePane({
 				paneConstraints: paneConstraintsArray,
 				paneIndex: index,
-				initialSize: 100,
+				initialSize: total,
+				total,
 			});
 			const delta = maxSafeSize - prevSize;
 
@@ -146,6 +150,7 @@ export function adjustLayoutByDelta({
 				paneConstraints: paneConstraintsArray,
 				paneIndex: index,
 				initialSize: unsafeSize,
+				total,
 			});
 
 			if (!areNumbersAlmostEqual(prevSize, safeSize)) {
@@ -190,6 +195,7 @@ export function adjustLayoutByDelta({
 			paneConstraints: paneConstraintsArray,
 			paneIndex: pivotIndex,
 			initialSize: unsafeSize,
+			total,
 		});
 
 		// Adjust the pivot pane before, but only by the amount that surrounding panes were able to shrink/contract.
@@ -210,6 +216,7 @@ export function adjustLayoutByDelta({
 					paneConstraints: paneConstraintsArray,
 					paneIndex: index,
 					initialSize: unsafeSize,
+					total,
 				});
 
 				if (!areNumbersAlmostEqual(prevSize, safeSize)) {
@@ -224,9 +231,9 @@ export function adjustLayoutByDelta({
 		}
 	}
 
-	const totalSize = nextLayout.reduce((total, size) => size + total, 0);
+	const totalSize = nextLayout.reduce((accumulated, size) => size + accumulated, 0);
 
-	if (!areNumbersAlmostEqual(totalSize, 100)) return prevLayout;
+	if (!areNumbersAlmostEqual(totalSize, total)) return prevLayout;
 
 	return nextLayout;
 }

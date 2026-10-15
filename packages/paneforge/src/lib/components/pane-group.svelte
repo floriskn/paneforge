@@ -13,6 +13,9 @@
 		keyboardResizeBy = null,
 		onLayoutChange = noop,
 		storage = defaultStorage,
+		units = "percentage",
+		evenOnDoubleClick = false,
+		align = false,
 		ref = $bindable(null),
 		child,
 		children,
@@ -30,11 +33,16 @@
 		keyboardResizeBy: box.with(() => keyboardResizeBy),
 		onLayout: box.with(() => onLayoutChange),
 		storage: box.with(() => storage),
+		units: box.with(() => units),
+		evenOnDoubleClick: box.with(() => evenOnDoubleClick),
+		align: box.with(() => align),
 	});
 
 	export const getLayout = () => paneGroupState.layout;
 	export const setLayout = paneGroupState.setLayout;
 	export const getId = () => paneGroupState.opts.id.current;
+	export const getTotalSize = () => paneGroupState.total;
+	export const distributeEvenly = paneGroupState.distributeEvenly;
 
 	const mergedProps = $derived(mergeProps(restProps, paneGroupState.props));
 </script>

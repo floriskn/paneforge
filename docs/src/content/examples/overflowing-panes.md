@@ -13,6 +13,23 @@ section: Examples
 
 <ViewExampleCode href="https://github.com/svecosystem/paneforge/blob/main/sites/docs/src/lib/components/demos/overflow-demo.svelte" />
 
+## Panes do not clip
+
+A pane does not hide what overflows it. It only stops its content from deciding its size, so
+the layout still follows the sizes you set — content that is too big spills out rather than
+being cut off.
+
+Decide what should happen to your own content, as the example does with `overflow-auto`. If
+you want a pane to clip, say so:
+
+```svelte
+<Pane defaultSize={50}>
+	<div class="h-full overflow-hidden">
+		<!-- ... content here-->
+	</div>
+</Pane>
+```
+
 ## Anatomy
 
 Here's the high-level structure of the example above:

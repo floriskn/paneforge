@@ -1,4 +1,4 @@
-import type { PaneState } from "$lib/paneforge.svelte.js";
+import type { PaneConstraints } from "../types.js";
 
 /**
  * A utility function that calculates the `aria-valuemax`, `aria-valuemin`,
@@ -6,24 +6,27 @@ import type { PaneState } from "$lib/paneforge.svelte.js";
  */
 export function calculateAriaValues({
 	layout,
-	panesArray,
+	paneConstraints,
 	pivotIndices,
+	total,
 }: {
 	layout: number[];
-	panesArray: PaneState[];
+	/** Every pane's constraints, in the unit the layout is kept in. */
+	paneConstraints: PaneConstraints[];
 	pivotIndices: number[];
+	/** The size the group has to share out, in the unit the layout is kept in. */
+	total: number;
 }) {
 	let currentMinSize = 0;
-	let currentMaxSize = 100;
+	let currentMaxSize = total;
 	let totalMinSize = 0;
 	let totalMaxSize = 0;
 
 	const firstIndex = pivotIndices[0];
 
 	// A pane's effective min/max sizes also need to account for other pane's sizes.
-	for (let i = 0; i < panesArray.length; i++) {
-		const constraints = panesArray[i].constraints;
-		const { maxSize = 100, minSize = 0 } = constraints;
+	for (let i = 0; i < paneConstraints.length; i++) {
+		const { maxSize = total, minSize = 0 } = paneConstraints[i];
 
 		if (i === firstIndex) {
 			currentMinSize = minSize;
@@ -34,8 +37,8 @@ export function calculateAriaValues({
 		}
 	}
 
-	const valueMax = Math.min(currentMaxSize, 100 - totalMinSize);
-	const valueMin = Math.max(currentMinSize, 100 - totalMaxSize);
+	const valueMax = Math.min(currentMaxSize, total - totalMinSize);
+	const valueMin = Math.max(currentMinSize, total - totalMaxSize);
 
 	const valueNow = layout[firstIndex];
 

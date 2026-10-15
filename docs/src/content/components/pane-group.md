@@ -22,6 +22,33 @@ The direction of the panes in the group. If set to `'horizontal'`, the panes wil
 
 </PropField>
 
+<PropField name="units" type="'percentage' | 'pixels'" default="'percentage'">
+
+The unit this group's panes are sized in, for the panes that do not say for themselves. Also
+the unit `keyboardResizeBy` is read in.
+
+Set it to size every pane in the group the same way. A single pane needing the other unit
+says so itself instead of the whole group changing — see
+[Pixel sizes](/docs/examples/pixel-sizes).
+
+</PropField>
+
+<PropField name="evenOnDoubleClick" type="boolean" default="false">
+
+Whether double clicking a resize handle gives every pane in the group the same size. The same
+thing is available as `distributeEvenly()`, so you can put it behind your own control
+instead.
+
+</PropField>
+
+<PropField name="align" type="boolean" default="false">
+
+Whether dividers in the groups nested directly inside this one are dragged together when
+they line up, as one line that goes only as far as all of them can. See
+[Aligned grids](/docs/examples/aligned-grids).
+
+</PropField>
+
 <PropField name="keyboardResizeBy" type="number | null" default="null">
 The amount of space to add to the pane group when the keyboard resize event is triggered. If not provided, the default value is used.
 </PropField>
@@ -59,6 +86,12 @@ Imperative API for the pane group. `bind` to this prop to get access to methods 
 	<PropField name="setLayout" type="(newLayout: number[]) => void">
 		Sets the layout of the pane group.
 	</PropField>
+	<PropField name="getTotalSize" type="() => number">
+		Gets the size the panes share out: 100 for a percentage group, and the space left over after the resizers for a pixel one.
+	</PropField>
+	<PropField name="distributeEvenly" type="() => void">
+		Gives every pane the same size, holding any pane that cannot take that size at its own limit.
+	</PropField>
 	<PropField name="getId" type="() => string">
 		Gets the ID of the pane group.
 	</PropField>
@@ -90,5 +123,7 @@ export type PaneGroupAttributes = {
 	"data-direction": "horizontal" | "vertical";
 	/** The ID of the pane group. */
 	"data-pane-group-id": string;
+	/** The unit the group's panes are sized in unless they say for themselves. */
+	"data-units": "percentage" | "pixels";
 };
 ```
