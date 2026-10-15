@@ -14,7 +14,7 @@
 		onLayoutChange = noop,
 		storage = defaultStorage,
 		units = "percentage",
-		evenOnDoubleClick = false,
+		doubleClick = "none",
 		align = false,
 		ref = $bindable(null),
 		child,
@@ -34,7 +34,7 @@
 		onLayout: box.with(() => onLayoutChange),
 		storage: box.with(() => storage),
 		units: box.with(() => units),
-		evenOnDoubleClick: box.with(() => evenOnDoubleClick),
+		doubleClick: box.with(() => doubleClick),
 		align: box.with(() => align),
 	});
 
@@ -43,6 +43,7 @@
 	export const getId = () => paneGroupState.opts.id.current;
 	export const getTotalSize = () => paneGroupState.total;
 	export const distributeEvenly = paneGroupState.distributeEvenly;
+	export const resetToDefaults = paneGroupState.resetToDefaults;
 
 	const mergedProps = $derived(mergeProps(restProps, paneGroupState.props));
 </script>

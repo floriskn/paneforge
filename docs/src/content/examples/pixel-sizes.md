@@ -125,23 +125,29 @@ should be measured the same way:
 A pane can still say otherwise for itself. Leaving the last pane without a `defaultSize` is
 how you say "take whatever is left over", in either unit.
 
-## Evening panes out
+## Double clicking a handle
 
-Double clicking a resize handle can give every pane in the group the same size. It is off
-unless you ask for it:
+Double clicking a resize handle can either give every pane in the group the same size, or put
+them back to the sizes they started at. It does nothing unless you say which:
 
 ```svelte
-<PaneGroup direction="horizontal" evenOnDoubleClick>
+<PaneGroup direction="horizontal" doubleClick="even">
 	<!-- ... -->
 </PaneGroup>
 ```
 
-Every pane ends up the same size on screen, whichever unit each of them is written in.
-Double clicking a [junction](/docs/components/pane-junctions) does the same to every group it
-can move, so a crossing evens out along both axes at once.
+**`"even"`** leaves every pane the same size on screen, whichever unit each of them is written
+in — a quarter of the available pixels each reads the same as 25% each.
 
-The same thing is available as `distributeEvenly()` on the group, if you would rather put it
-behind a button or a keyboard shortcut:
+**`"reset"`** goes back to each pane's `defaultSize`, with whatever is left over shared between
+the panes that were given none. For the sidebar above that is 200px again, with the content pane
+taking the rest, however far either of them had been dragged.
+
+Double clicking a [junction](/docs/components/pane-junctions) does the same to every group it
+can move, so a crossing acts along both axes at once.
+
+Both are available on the group as well, if you would rather put them behind a button or a
+keyboard shortcut:
 
 ```svelte
 <script lang="ts">
@@ -151,6 +157,7 @@ behind a button or a keyboard shortcut:
 </script>
 
 <button onclick={() => group.distributeEvenly()}>Even out</button>
+<button onclick={() => group.resetToDefaults()}>Reset</button>
 
 <PaneGroup bind:this={group} direction="horizontal">
 	<!-- ... -->

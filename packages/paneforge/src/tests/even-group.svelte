@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { Pane, PaneGroup, PaneResizer } from "$lib/index.js";
-	import type { PaneUnits } from "$lib/index.js";
+	import type { PaneDoubleClick, PaneUnits } from "$lib/index.js";
 
 	let {
 		onLayout,
 		units = "percentage",
-		evenOnDoubleClick = true,
+		doubleClick = "even",
 		thirdMinSize,
 	}: {
 		onLayout: (layout: number[]) => void;
 		units?: PaneUnits;
-		evenOnDoubleClick?: boolean;
+		doubleClick?: PaneDoubleClick;
 		thirdMinSize?: number;
 	} = $props();
 
@@ -25,7 +25,7 @@
 	direction="horizontal"
 	id="root"
 	{units}
-	{evenOnDoubleClick}
+	{doubleClick}
 	onLayoutChange={onLayout}
 	data-rect="0,0,600,400"
 >

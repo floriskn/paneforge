@@ -2,6 +2,7 @@ import type { Snippet } from "svelte";
 import type { HTMLAttributes } from "svelte/elements";
 import type {
 	Direction,
+	PaneDoubleClick,
 	PaneGroupUnits,
 	PaneSize,
 	PaneUnits,
@@ -45,7 +46,7 @@ export type WithChild<
 
 export type PaneForgePrimitiveDivAttributes = Primitive<HTMLAttributes<HTMLDivElement>>;
 
-export type { Direction, PaneSize, PaneUnits, PaneGroupUnits };
+export type { Direction, PaneDoubleClick, PaneSize, PaneUnits, PaneGroupUnits };
 
 /**
  * Every size on a pane is read in its own `units`: a share of the group by default, or pixels
@@ -178,14 +179,19 @@ export type PaneGroupPropsWithoutHTML = WithChild<{
 	units?: PaneUnits;
 
 	/**
-	 * Whether double clicking a resize handle gives every pane in the group the same size.
+	 * What double clicking a resize handle in this group does to its sizes.
 	 *
-	 * Off by default. The same thing is available as `distributeEvenly()` on the group, so
-	 * you can put it behind your own control instead.
+	 * `"even"` gives every pane in the group the same size. `"reset"` puts them back to the
+	 * sizes they started at — each pane's `defaultSize`, with whatever is left over shared
+	 * between the panes that were given none.
 	 *
-	 * @defaultValue `false`
+	 * Both are also available as `distributeEvenly()` and `resetToDefaults()` on the group, so
+	 * you can put either behind your own control instead. `"none"` leaves the double click
+	 * alone for you to handle however you like.
+	 *
+	 * @defaultValue `"none"`
 	 */
-	evenOnDoubleClick?: boolean;
+	doubleClick?: PaneDoubleClick;
 
 	/**
 	 * Whether dividers in the groups nested directly inside this one are dragged together
@@ -357,6 +363,11 @@ export type PaneGroupAPI = {
 	 * at their own limits and the rest is shared out among the panes that can.
 	 */
 	distributeEvenly: () => void;
+	/**
+	 * Put every pane back to the size it started at: its `defaultSize`, with whatever is left
+	 * over shared between the panes that were given none. A saved layout is not consulted.
+	 */
+	resetToDefaults: () => void;
 };
 
 /**

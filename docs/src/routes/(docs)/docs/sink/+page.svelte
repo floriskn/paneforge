@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Pane, PaneGroup, PaneJunctions, PaneResizer } from "paneforge";
-	import type { PaneJunction } from "paneforge";
+	import type { PaneDoubleClick, PaneJunction } from "paneforge";
 	import type { Snippet } from "svelte";
 
 	/**
@@ -54,6 +54,9 @@
 	];
 
 	let gridAlign = $state(true);
+
+	/** What a double click does, so both actions can be tried out from the page. */
+	let gridDoubleClick = $state<PaneDoubleClick>("even");
 </script>
 
 {#snippet bar(id: string)}
@@ -120,9 +123,9 @@
 -->
 {#snippet quadGrid(prefix: string, outer: "horizontal" | "vertical", labels: string[])}
 	{@const inner = outer === "horizontal" ? "vertical" : "horizontal"}
-	<PaneGroup direction={outer} align={gridAlign} evenOnDoubleClick>
+	<PaneGroup direction={outer} align={gridAlign} doubleClick={gridDoubleClick}>
 		<Pane defaultSize={50} minSize={15}>
-			<PaneGroup direction={inner} evenOnDoubleClick>
+			<PaneGroup direction={inner} doubleClick={gridDoubleClick}>
 				<Pane defaultSize={50} minSize={15}>{@render cell(labels[0])}</Pane>
 				{@render bar(`${prefix}-first`)}
 				<Pane defaultSize={50} minSize={15}>{@render cell(labels[1])}</Pane>
@@ -130,7 +133,7 @@
 		</Pane>
 		{@render bar(`${prefix}-main`)}
 		<Pane defaultSize={50} minSize={15}>
-			<PaneGroup direction={inner} evenOnDoubleClick>
+			<PaneGroup direction={inner} doubleClick={gridDoubleClick}>
 				<Pane defaultSize={50} minSize={15}>{@render cell(labels[2])}</Pane>
 				{@render bar(`${prefix}-second`)}
 				<Pane defaultSize={50} minSize={15}>{@render cell(labels[3])}</Pane>
@@ -149,17 +152,17 @@
 		a pane happens to sit inside means the same editor has a different smallest size at every
 		nesting depth; in pixels it is the same everywhere, which is what VS Code does.
 	-->
-	<PaneGroup direction="horizontal" evenOnDoubleClick>
+	<PaneGroup direction="horizontal" doubleClick={gridDoubleClick}>
 		<Pane units="pixels" defaultSize={260} minSize={180} maxSize={480}>
 			{@render cell("Explorer", "260px · min 180 · max 480")}
 		</Pane>
 		{@render bar("vs-explorer")}
 		<Pane minSize="360px">
-			<PaneGroup direction="vertical" evenOnDoubleClick>
+			<PaneGroup direction="vertical" doubleClick={gridDoubleClick}>
 				<Pane defaultSize={72} minSize="96px">
-					<PaneGroup direction="horizontal" evenOnDoubleClick>
+					<PaneGroup direction="horizontal" doubleClick={gridDoubleClick}>
 						<Pane defaultSize={58} minSize="48px">
-							<PaneGroup direction="vertical" evenOnDoubleClick>
+							<PaneGroup direction="vertical" doubleClick={gridDoubleClick}>
 								<Pane defaultSize={60} minSize="48px">
 									{@render cell("main.ts", "min 48px")}
 								</Pane>
@@ -171,13 +174,13 @@
 						</Pane>
 						{@render bar("vs-editor")}
 						<Pane defaultSize={42} minSize="96px">
-							<PaneGroup direction="vertical" evenOnDoubleClick>
+							<PaneGroup direction="vertical" doubleClick={gridDoubleClick}>
 								<Pane defaultSize={45} minSize="48px">
 									{@render cell("preview.html")}
 								</Pane>
 								{@render bar("vs-col-b")}
 								<Pane defaultSize={55} minSize="48px">
-									<PaneGroup direction="horizontal" evenOnDoubleClick>
+									<PaneGroup direction="horizontal" doubleClick={gridDoubleClick}>
 										<Pane defaultSize={50} minSize="48px">
 											{@render cell("notes.md")}
 										</Pane>
@@ -202,13 +205,13 @@
 {/snippet}
 
 {#snippet complex()}
-	<PaneGroup direction="horizontal" evenOnDoubleClick>
+	<PaneGroup direction="horizontal" doubleClick={gridDoubleClick}>
 		<Pane defaultSize={22} minSize={12}>
-			<PaneGroup direction="vertical" evenOnDoubleClick>
+			<PaneGroup direction="vertical" doubleClick={gridDoubleClick}>
 				<Pane defaultSize={50} minSize={15}>{@render cell("A1")}</Pane>
 				{@render bar("cx-a")}
 				<Pane defaultSize={50} minSize={15}>
-					<PaneGroup direction="horizontal" evenOnDoubleClick>
+					<PaneGroup direction="horizontal" doubleClick={gridDoubleClick}>
 						<Pane defaultSize={50} minSize={20}>{@render cell("A2")}</Pane>
 						{@render bar("cx-a2")}
 						<Pane defaultSize={50} minSize={20}>{@render cell("A3")}</Pane>
@@ -220,13 +223,13 @@
 		{@render bar("cx-left")}
 
 		<Pane defaultSize={53} minSize={25}>
-			<PaneGroup direction="vertical" evenOnDoubleClick>
+			<PaneGroup direction="vertical" doubleClick={gridDoubleClick}>
 				<Pane defaultSize={42} minSize={15}>
-					<PaneGroup direction="horizontal" evenOnDoubleClick>
+					<PaneGroup direction="horizontal" doubleClick={gridDoubleClick}>
 						<Pane defaultSize={33} minSize={12}>{@render cell("B1")}</Pane>
 						{@render bar("cx-b1")}
 						<Pane defaultSize={34} minSize={12}>
-							<PaneGroup direction="vertical" evenOnDoubleClick>
+							<PaneGroup direction="vertical" doubleClick={gridDoubleClick}>
 								<Pane defaultSize={50} minSize={20}>{@render cell("B2")}</Pane>
 								{@render bar("cx-b2")}
 								<Pane defaultSize={50} minSize={20}>{@render cell("B3")}</Pane>
@@ -245,7 +248,7 @@
 
 		<Pane defaultSize={25} minSize={12}>
 			<!-- Pixels inside percentages: these rows keep their heights. -->
-			<PaneGroup direction="vertical" units="pixels" evenOnDoubleClick>
+			<PaneGroup direction="vertical" units="pixels" doubleClick={gridDoubleClick}>
 				<Pane defaultSize={120} minSize={60}>{@render cell("C1", "120px")}</Pane>
 				{@render bar("cx-c1")}
 				<Pane defaultSize={160} minSize={60}>{@render cell("C2", "160px")}</Pane>
@@ -270,8 +273,19 @@
 	<p class="text-muted-foreground text-sm">
 		Resizers are 1px until hovered or dragged. Hover a junction and every resizer meeting there
 		lights up; hover a divider that is linked to another and both do. Double click a resizer to
-		even out its group, or a junction to even out every group it can move.
+		act on its group, or a junction to act on every group it can move.
 	</p>
+
+	<fieldset class="flex flex-wrap items-center gap-4 text-sm">
+		<legend class="sr-only">What a double click does</legend>
+		<span class="text-muted-foreground"><code>doubleClick</code></span>
+		{#each ["even", "reset", "none"] as const as action (action)}
+			<label class="flex items-center gap-2">
+				<input type="radio" value={action} bind:group={gridDoubleClick} />
+				<code>{action}</code>
+			</label>
+		{/each}
+	</fieldset>
 
 	<section class="space-y-2">
 		<h2 class="text-base font-semibold">1 · VS Code shape</h2>

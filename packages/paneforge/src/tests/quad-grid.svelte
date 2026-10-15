@@ -20,12 +20,12 @@
 	Mirrors the 2x2 grid in the sink: four leaf panes, both halves the same size, `align` on
 	the group that holds them. The rects describe a 400x400 box split down the middle.
 -->
-<PaneGroup direction={outer} id="root" {align} evenOnDoubleClick data-rect="0,0,400,400">
+<PaneGroup direction={outer} id="root" {align} doubleClick="even" data-rect="0,0,400,400">
 	<Pane defaultSize={50} minSize={15}>
 		<PaneGroup
 			direction={inner}
 			id="first"
-			evenOnDoubleClick
+			doubleClick="even"
 			onLayoutChange={onFirst}
 			data-rect="0,0,400,400"
 		>
@@ -39,7 +39,7 @@
 		<PaneGroup
 			direction={inner}
 			id="second"
-			evenOnDoubleClick
+			doubleClick="even"
 			onLayoutChange={onSecond}
 			data-rect="0,0,400,400"
 		>

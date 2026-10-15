@@ -19,6 +19,14 @@ export type PaneUnits = "percentage" | "pixels";
 /** @deprecated Units are a property of a pane. Use {@link PaneUnits}. */
 export type PaneGroupUnits = PaneUnits;
 
+/**
+ * What double clicking a resize handle does to the sizes in its group.
+ *
+ * `none` leaves the double click alone, to be handled wherever you like. `even` gives every
+ * pane in the group the same size. `reset` puts them back to the sizes they started at.
+ */
+export type PaneDoubleClick = "none" | "even" | "reset";
+
 export type PaneOnCollapse = () => void;
 export type PaneOnExpand = () => void;
 export type PaneOnResize = (size: number, prevSize: number | undefined) => void;

@@ -1,20 +1,21 @@
 <script lang="ts">
 	import { Pane, PaneGroup, PaneJunctions, PaneResizer } from "$lib/index.js";
+	import type { PaneDoubleClick } from "$lib/index.js";
 
 	let {
 		onRootLayout,
 		onLeftLayout,
 		onRightLayout,
-		evenOnDoubleClick = true,
-		rightEvenOnDoubleClick = true,
+		doubleClick = "even",
+		rightDoubleClick = "even",
 		onRootResizerDoubleClick,
 	}: {
 		onRootLayout: (layout: number[]) => void;
 		onLeftLayout: (layout: number[]) => void;
 		onRightLayout: (layout: number[]) => void;
-		evenOnDoubleClick?: boolean;
-		/** Set apart so one group can sit out while the others are evened. */
-		rightEvenOnDoubleClick?: boolean;
+		doubleClick?: PaneDoubleClick;
+		/** Set apart so one group can sit out while the others are acted on. */
+		rightDoubleClick?: PaneDoubleClick;
 		/** A handler of one's own on the resizer the junction is rendered inside. */
 		onRootResizerDoubleClick?: () => void;
 	} = $props();
@@ -28,7 +29,7 @@
 <PaneGroup
 	direction="horizontal"
 	id="root"
-	{evenOnDoubleClick}
+	{doubleClick}
 	onLayoutChange={onRootLayout}
 	data-rect="0,0,400,400"
 >
@@ -36,7 +37,7 @@
 		<PaneGroup
 			direction="vertical"
 			id="left"
-			{evenOnDoubleClick}
+			{doubleClick}
 			onLayoutChange={onLeftLayout}
 			data-rect="0,0,198,400"
 		>
@@ -55,12 +56,16 @@
 		<PaneGroup
 			direction="vertical"
 			id="right"
-			evenOnDoubleClick={rightEvenOnDoubleClick}
+			doubleClick={rightDoubleClick}
 			onLayoutChange={onRightLayout}
 			data-rect="202,0,400,400"
 		>
 			<Pane defaultSize={20} />
-			<PaneResizer id="right-resizer" data-rect="202,198,400,202" />
+			<PaneResizer
+				id="right-resizer"
+				data-rect="202,198,400,202"
+				data-testid="right-resizer"
+			/>
 			<Pane defaultSize={80} />
 		</PaneGroup>
 	</Pane>

@@ -74,8 +74,8 @@ by the smallest share any of them could manage, so a pair that started out as on
 one line. When one reaches a pane's `minSize`, that is where both stop — the other does not run
 on and leave the line broken in two, whatever the panes on either side allow.
 
-**Double clicking evens out both.** With `evenOnDoubleClick`, double clicking a linked divider
-evens out both of their groups, which leaves them on the same line.
+**Double clicking acts on both.** With `doubleClick` set, double clicking a linked divider
+evens out — or resets — both of their groups, which leaves them on the same line either way.
 
 **It reaches one level.** `align` links the dividers of the groups nested directly inside the
 marked group. Mark a nested group too if you want its own children linked.

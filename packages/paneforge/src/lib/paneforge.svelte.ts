@@ -47,6 +47,7 @@ import {
 } from "$lib/internal/utils/junctions.js";
 import type {
 	Direction,
+	PaneDoubleClick,
 	DragState,
 	HostedJunction,
 	PaneConstraints,
@@ -138,7 +139,7 @@ interface PaneGroupStateOpts
 			onLayout: (layout: number[]) => void | null;
 			storage: PaneGroupStorage;
 			units: PaneUnits;
-			evenOnDoubleClick: boolean;
+			doubleClick: PaneDoubleClick;
 			align: boolean;
 		}> {}
 
@@ -672,6 +673,51 @@ export class PaneGroupState {
 		if (areArraysEqual(this.layout, nextLayout)) return;
 
 		this.#applyLayout(nextLayout);
+	};
+
+	/**
+	 * Puts every pane back to the size it started at.
+	 *
+	 * The same sizes the group lays out with on first render: each pane's `defaultSize`, with
+	 * whatever is left over shared between the panes that were given none. A saved layout is
+	 * not consulted — this is a way back to what the panes were written with.
+	 */
+	resetToDefaults = () => {
+		const total = this.total;
+		if (this.panesArray.length === 0 || total <= 0) return;
+
+		const paneConstraints = this.paneConstraints;
+
+		const nextLayout = validatePaneGroupLayout({
+			layout: getUnsafeDefaultLayout({ paneConstraints, total }),
+			paneConstraints,
+			total,
+			absolute: this.#absolute,
+		});
+
+		if (areArraysEqual(this.layout, nextLayout)) return;
+
+		this.#applyLayout(nextLayout);
+	};
+
+	/**
+	 * Carries out whatever double clicking a divider in this group is meant to do, and says
+	 * whether that was anything at all.
+	 *
+	 * A divider and a junction both come through here, so the two never disagree about what a
+	 * double click means for a given group.
+	 */
+	applyDoubleClick = (): boolean => {
+		switch (this.opts.doubleClick.current) {
+			case "even":
+				this.distributeEvenly();
+				return true;
+			case "reset":
+				this.resetToDefaults();
+				return true;
+			default:
+				return false;
+		}
 	};
 
 	/** Takes a layout with every pane's size in its own units. */
@@ -1325,14 +1371,14 @@ export class PaneResizerState {
 
 	#ondblclick: MouseEventHandler<HTMLElement> = (e) => {
 		if (this.opts.disabled.current || e.defaultPrevented) return;
-		if (!this.group.opts.evenOnDoubleClick.current) return;
+		if (this.group.opts.doubleClick.current === "none") return;
 
 		e.preventDefault();
 
-		// Evening out leaves the dividers where they started, so anything linked to this one
-		// is evened too rather than being left behind.
-		for (const linked of this.group.linkedResizersFor(this)) linked.group.distributeEvenly();
-		this.group.distributeEvenly();
+		// Either action leaves the dividers somewhere both groups agree on, so anything linked
+		// to this one comes along rather than being left behind.
+		for (const linked of this.group.linkedResizersFor(this)) linked.group.applyDoubleClick();
+		this.group.applyDoubleClick();
 	};
 
 	#onmouseup: MouseEventHandler<HTMLElement> = () => {
@@ -1782,25 +1828,26 @@ export class PaneJunctionsState {
 	};
 
 	/**
-	 * Evens out every group the junction can move, so double clicking one does to all of its
-	 * axes what double clicking a resizer does to one.
+	 * Does to every group the junction can move what double clicking a resizer does to one, so
+	 * a crossing evens out — or resets — along both axes at once.
 	 *
-	 * Groups that have not asked for this are left alone, as they are for a resizer.
+	 * Each group has its own say in what a double click means, and groups that asked for
+	 * nothing are left alone, as they are for a resizer.
 	 */
-	#evenOut = (junction: ComputedJunction, e: MouseEvent) => {
+	#doubleClick = (junction: ComputedJunction, e: MouseEvent) => {
 		if (this.opts.disabled.current || e.defaultPrevented) return;
 
 		const groups = [...this.#groupsFor(junction)].filter(
-			(group) => group.opts.evenOnDoubleClick.current
+			(group) => group.opts.doubleClick.current !== "none"
 		);
 		if (groups.length === 0) return;
 
 		e.preventDefault();
 		// The junction is rendered inside one of the resizers it drives, which would otherwise
-		// even out its own group a second time.
+		// act on its own group a second time.
 		e.stopPropagation();
 
-		for (const group of groups) group.distributeEvenly();
+		for (const group of groups) group.applyDoubleClick();
 	};
 
 	#stopDraggingFromEvent = (e: MouseEvent | TouchEvent) => {
@@ -1911,7 +1958,7 @@ export class PaneJunctionsState {
 				"-webkit-touch-callout": "none",
 			},
 			onmousedown: (e: MouseEvent) => this.#startDragging(junction, e),
-			ondblclick: (e: MouseEvent) => this.#evenOut(junction, e),
+			ondblclick: (e: MouseEvent) => this.#doubleClick(junction, e),
 			ontouchstart: (e: TouchEvent) => this.#startDragging(junction, e),
 			onmouseup: this.#stopDraggingFromEvent,
 			ontouchend: this.#stopDraggingFromEvent,

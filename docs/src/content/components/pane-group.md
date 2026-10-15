@@ -33,11 +33,17 @@ says so itself instead of the whole group changing — see
 
 </PropField>
 
-<PropField name="evenOnDoubleClick" type="boolean" default="false">
+<PropField name="doubleClick" type="'none' | 'even' | 'reset'" default="'none'">
 
-Whether double clicking a resize handle gives every pane in the group the same size. The same
-thing is available as `distributeEvenly()`, so you can put it behind your own control
-instead.
+What double clicking a resize handle in this group does to its sizes.
+
+`'even'` gives every pane in the group the same size. `'reset'` puts them back to the sizes
+they started at — each pane's `defaultSize`, with whatever is left over shared between the
+panes that were given none.
+
+Both are also available as `distributeEvenly()` and `resetToDefaults()` on the group, so you
+can put either behind your own control instead. `'none'` leaves the double click alone for you
+to handle however you like.
 
 </PropField>
 
@@ -89,12 +95,20 @@ Imperative API for the pane group. `bind` to this prop to get access to methods 
 	<PropField name="getTotalSize" type="() => number">
 		Gets the size the panes share out: 100 for a percentage group, and the space left over after the resizers for a pixel one.
 	</PropField>
-	<PropField name="distributeEvenly" type="() => void">
-		Gives every pane the same size, holding any pane that cannot take that size at its own limit.
-	</PropField>
-	<PropField name="getId" type="() => string">
-		Gets the ID of the pane group.
-	</PropField>
+	<PropField name="resetToDefaults" type="() => void">
+
+Put every pane back to the size it started at: its `defaultSize`, with whatever is left over
+shared between the panes that were given none. A saved layout is not consulted.
+
+</PropField>
+
+    <PropField name="distributeEvenly" type="() => void">
+    	Gives every pane the same size, holding any pane that cannot take that size at its own limit.
+    </PropField>
+    <PropField name="getId" type="() => string">
+    	Gets the ID of the pane group.
+    </PropField>
+
 </Collapsible>
 </PropField>
 

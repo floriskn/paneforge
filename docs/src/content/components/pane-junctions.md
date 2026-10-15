@@ -113,19 +113,19 @@ rather than the other columns running on and leaving the line broken in two.
 The two axes are independent of one another. One axis running out of room does not hold the
 other back.
 
-## Evening out
+## Double clicking
 
-Double clicking a junction gives every pane it can move the same size, which is the same thing
-[`evenOnDoubleClick`](/docs/components/pane-group) does for a single resizer — applied to every
-group the junction drags, so a crossing evens out along both axes at once.
+Double clicking a junction does what [`doubleClick`](/docs/components/pane-group) does for a
+single resizer — applied to every group the junction drags, so a crossing evens out, or resets,
+along both axes at once.
 
-It follows the same opt-in: groups that have asked for it are evened out and groups that have
-not are left as they are. If none of them have, the double click is left alone to be handled
+Each group has its own say in which of those it is: groups that asked for nothing are left as
+they are, and if none of them asked for anything the double click is left alone to be handled
 wherever you like.
 
 ```svelte
 <!-- Double clicking the crossing evens out the rows and the columns together. -->
-<PaneGroup direction="horizontal" evenOnDoubleClick>
+<PaneGroup direction="horizontal" doubleClick="even">
 	<!-- ... -->
 	<PaneJunctions />
 </PaneGroup>

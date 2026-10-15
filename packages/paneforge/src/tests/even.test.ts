@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/svelte";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import EvenGroup from "./even-group.svelte";
-import type { PaneUnits } from "$lib/index.js";
+import type { PaneDoubleClick, PaneUnits } from "$lib/index.js";
 
 function useStubbedLayout() {
 	const boxOf = (element: Element) => {
@@ -39,7 +39,7 @@ function useStubbedLayout() {
 function setup(
 	props: {
 		units?: PaneUnits;
-		evenOnDoubleClick?: boolean;
+		doubleClick?: PaneDoubleClick;
 		thirdMinSize?: number;
 	} = {}
 ) {
@@ -110,7 +110,7 @@ describe("double clicking a resize handle", () => {
 	});
 
 	it("does nothing unless the group asks for it", async () => {
-		const { findByTestId, layout } = setup({ evenOnDoubleClick: false });
+		const { findByTestId, layout } = setup({ doubleClick: "none" });
 
 		const resizer = await findByTestId("first");
 		await waitFor(() => expect(layout()).toEqual([20, 30, 50]));
@@ -119,5 +119,68 @@ describe("double clicking a resize handle", () => {
 
 		// Still exactly as it started.
 		await waitFor(() => expect(layout()).toEqual([20, 30, 50]));
+	});
+});
+
+/** Drags the first handle 60px of the 600px group, which is 10%. */
+async function dragFirstHandle(resizer: HTMLElement) {
+	await fireEvent.mouseDown(resizer, { clientX: 102, clientY: 0 });
+	await fireEvent.mouseMove(document.body, { clientX: 162, clientY: 0 });
+	await fireEvent.mouseUp(window);
+}
+
+describe("resetting on a double click", () => {
+	it("puts every pane back to the size it started at", async () => {
+		const { findByTestId, layout } = setup({ doubleClick: "reset" });
+
+		const resizer = await findByTestId("first");
+		await waitFor(() => expect(layout()).toEqual([20, 30, 50]));
+
+		await dragFirstHandle(resizer);
+		await waitFor(() => expect(layout()[0]).toBeCloseTo(30));
+
+		await fireEvent.dblClick(resizer);
+
+		// The sizes the panes were written with, not an even third each.
+		await waitFor(() => expect(layout()).toEqual([20, 30, 50]));
+	});
+
+	it("puts a pane sized in pixels back to its own pixels", async () => {
+		const { findByTestId, layout } = setup({ units: "pixels", doubleClick: "reset" });
+
+		const resizer = await findByTestId("first");
+		// 600px of group, less two 4px resizers, is 592px for the panes.
+		await waitFor(() => expect(layout()).toEqual([100, 200, 292]));
+
+		await dragFirstHandle(resizer);
+		await waitFor(() => expect(layout()[0]).toBeCloseTo(160));
+
+		await fireEvent.dblClick(resizer);
+
+		// The last pane was given no size of its own, so it takes the rest back.
+		await waitFor(() => expect(layout()).toEqual([100, 200, 292]));
+	});
+
+	it("holds a pane at its own limit while putting the rest back", async () => {
+		// The last pane starts at 50 and may not go below it, which its default already is.
+		const { findByTestId, layout } = setup({ doubleClick: "reset", thirdMinSize: 50 });
+
+		const resizer = await findByTestId("first");
+		await dragFirstHandle(resizer);
+		await fireEvent.dblClick(resizer);
+
+		await waitFor(() => expect(layout()).toEqual([20, 30, 50]));
+	});
+
+	it("resets rather than evens, which are not the same place", async () => {
+		// Worth stating plainly: the panes here start at 20/30/50, so an even split and the
+		// sizes they were written with are two different layouts.
+		const { findByTestId, layout } = setup({ doubleClick: "reset" });
+
+		const resizer = await findByTestId("first");
+		await fireEvent.dblClick(resizer);
+
+		await waitFor(() => expect(layout()).toEqual([20, 30, 50]));
+		expect(layout()[0]).not.toBeCloseTo(100 / 3);
 	});
 });

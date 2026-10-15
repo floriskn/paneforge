@@ -14,7 +14,7 @@
 <div class="mt-4 h-[300px]">
 	<PaneGroup
 		direction="horizontal"
-		evenOnDoubleClick
+		doubleClick="even"
 		onLayoutChange={(layout) => {
 			sizes = layout;
 		}}
@@ -46,5 +46,5 @@
 <p class="text-muted-foreground mt-3 text-sm">
 	Only the sidebar is sized in pixels. Resize the window: it keeps its width and the content pane,
 	which takes a share of the group, absorbs the difference. Double click the handle to even them
-	out.
+	out, or set <code>doubleClick="reset"</code> to send them back to where they started.
 </p>
